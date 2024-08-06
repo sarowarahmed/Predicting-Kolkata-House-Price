@@ -17,4 +17,7 @@ with st.expander('Data'):
   st.write('**y**')
   y = df['PRICE(₹)']
   y
+
+with st.expander('Data Visualization'):
+  st.scatter_chart(data=df, x='Location', y='PRICE(₹)', color='Flood_Zone')
  
