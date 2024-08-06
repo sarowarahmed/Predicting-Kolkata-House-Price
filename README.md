@@ -1,6 +1,6 @@
 # 🏠 Predicting Kolkata House Price
 
-This is a Machine Learning App for predicting the House Prices in Kolakata.
+This is a Machine Learning App for predicting the House Prices in Kolkata.
 
 ## Demo App
 
