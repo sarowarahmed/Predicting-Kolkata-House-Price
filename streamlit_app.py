@@ -21,3 +21,10 @@ with st.expander('Data'):
 with st.expander('Data Visualization'):
   st.scatter_chart(data=df, x='Location', y='Flood_Zone', color='PRICE(₹)')
  
+#Data Preparation
+with st.sidebar:
+  st.header('Input Features')
+  # Location,Property_Type,Number_of_Bedrooms,Age_of_Property,Furnishing_Status,Square_Footage,Crime_Rate_in_Area,Air_Quality_Index,Ownership_Type
+  Location = st.selectbox('Location', ('Salt Lake', 'New Town', 'Ballygunge', 'Alipore', 'Howrah', 'Madhyamgram'))
+  Property_Type = st.selectbox('Property Type', ('Apartment', 'Villa', 'Independent House'))
+  Number_of_Bedrooms = st.slider('BHK', 1,4)
