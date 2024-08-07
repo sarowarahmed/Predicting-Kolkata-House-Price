@@ -1,5 +1,13 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import matplotlib.pyplot as plt
 
 st.title('🏡Predicting Kolkata House Price')
 
@@ -47,3 +55,36 @@ with st.expander('Input Features'):
   input_df
   st.write('**Combined Housing Data**')
   input_concatenate
+
+# Split the data
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Method 1: Using scikit-learn
+
+# Preprocessing
+preprocessor = ColumnTransformer(
+    transformers=[
+        ('num', StandardScaler(), ['Number_of_Bedrooms', 'Age_of_Property', 'Square_Footage', 'Crime_Rate_in_Area', 'Air_Quality_Index']),
+        ('cat', OneHotEncoder(drop='first', sparse=False), ['Location', 'Property_Type', 'Furnishing_Status', 'Ownership_Type', 'Flood_Zone'])
+    ])
+
+# Create a pipeline
+model = Pipeline([
+    ('preprocessor', preprocessor),
+    ('regressor', LinearRegression())
+])
+
+# Fit the model
+model.fit(X_train, y_train)
+
+# Make predictions
+if st.button('Predict House Price'):
+    # Preprocess the input
+    input_processed = preprocessor.transform(input_df)
+    
+    # Make prediction
+    prediction = model.predict(input_processed)
+    
+    # Display Predicted Housing Price
+    st.subheader('Predicted House Price')
+    st.success(f'The predicted price for the house is ₹{prediction[0]:,.2f}')
