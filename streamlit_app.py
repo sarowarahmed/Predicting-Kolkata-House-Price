@@ -59,12 +59,22 @@ with st.expander('Input Features'):
 # Split the data
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
+# Print column names for debugging
+st.write("Columns in X:", X.columns.tolist())
+st.write("Columns in input_df:", input_df.columns.tolist())
+
+# Identify numeric and categorical columns
+numeric_features = X.select_dtypes(include=['int64', 'float64']).columns.tolist()
+categorical_features = X.select_dtypes(include=['object', 'category']).columns.tolist()
+
 # Preprocessing
 preprocessor = ColumnTransformer(
     transformers=[
-        ('num', StandardScaler(), ['Number_of_Bedrooms', 'Age_of_Property', 'Square_Footage', 'Crime_Rate_in_Area', 'Air_Quality_Index']),
-        ('cat', OneHotEncoder(drop='first', sparse_output=False), ['Location', 'Property_Type', 'Furnishing_Status', 'Ownership_Type', 'Flood_Zone'])
-    ])
+        ('num', StandardScaler(), numeric_features),
+        ('cat', OneHotEncoder(drop='first', sparse_output=False), categorical_features)
+    ],
+    remainder='passthrough'  # This will include any columns not explicitly mentioned
+)
 
 # Create a pipeline
 model = Pipeline([
@@ -73,16 +83,41 @@ model = Pipeline([
 ])
 
 # Fit the model
-model.fit(X, y)  # Using all data for simplicity, consider using train_test_split in practice
+model.fit(X, y)
 
 # Make predictions
 if st.button('Predict House Price'):
-    # Preprocess the input
-    input_processed = model.named_steps['preprocessor'].transform(input_df)
-    
-    # Make prediction
-    prediction = model.predict(input_processed)
-    
-    # Display Predicted Housing Price
-    st.subheader('Predicted House Price')
-    st.success(f'The predicted price for the house is ₹{prediction[0]:,.2f}')
+    try:
+        # Ensure input_df has all necessary columns
+        for col in X.columns:
+            if col not in input_df.columns:
+                input_df[col] = np.nan  # or some default value
+
+        # Reorder columns to match X
+        input_df = input_df.reindex(columns=X.columns)
+
+        # Preprocess the input
+        input_processed = model.named_steps['preprocessor'].transform(input_df)
+        
+        # Make prediction
+        prediction = model.predict(input_processed)
+        
+        # Display Predicted Housing Price
+        st.subheader('Predicted House Price')
+        st.success(f'The predicted price for the house is ₹{prediction[0]:,.2f}')
+
+        # Optional: Display model performance metrics
+        y_pred = model.predict(X)
+        mse = mean_squared_error(y, y_pred)
+        r2 = r2_score(y, y_pred)
+        
+        st.write('Model Performance:')
+        st.write(f'Mean Squared Error: {mse:,.2f}')
+        st.write(f'R-squared Score: {r2:.4f}')
+
+    except Exception as e:
+        st.error(f"An error occurred: {str(e)}")
+        st.write("Input DataFrame:")
+        st.write(input_df)
+        st.write("Model Columns:")
+        st.write(X.columns.tolist())
