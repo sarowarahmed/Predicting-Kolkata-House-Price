@@ -72,7 +72,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 preprocessor = ColumnTransformer(
     transformers=[
         ('num', StandardScaler(), ['Number_of_Bedrooms', 'Age_of_Property', 'Square_Footage', 'Crime_Rate_in_Area', 'Air_Quality_Index']),
-        ('cat', OneHotEncoder(drop='first', sparse=False), ['Location', 'Property_Type', 'Furnishing_Status', 'Ownership_Type', 'Flood_Zone'])
+        ('cat', OneHotEncoder(drop='first', sparse_output=False), ['Location', 'Property_Type', 'Furnishing_Status', 'Ownership_Type', 'Flood_Zone'])
     ])
 
 # Create a pipeline
