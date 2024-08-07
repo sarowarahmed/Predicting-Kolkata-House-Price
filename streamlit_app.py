@@ -60,6 +60,10 @@ with st.expander('Input Features'):
 # Split the data
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
+# Print column names for debugging
+st.write("Columns in X:", X.columns.tolist())
+st.write("Columns in input_df:", input_df.columns.tolist())
+
 # Identify numeric and categorical columns
 numeric_features = X.select_dtypes(include=['int64', 'float64']).columns.tolist()
 categorical_features = X.select_dtypes(include=['object', 'category']).columns.tolist()
