@@ -8,6 +8,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
 import matplotlib.pyplot as plt
+from sklearn.impute import SimpleImputer
 
 st.title('🏡Predicting Kolkata House Price')
 
@@ -59,22 +60,26 @@ with st.expander('Input Features'):
 # Split the data
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Print column names for debugging
-st.write("Columns in X:", X.columns.tolist())
-st.write("Columns in input_df:", input_df.columns.tolist())
-
 # Identify numeric and categorical columns
 numeric_features = X.select_dtypes(include=['int64', 'float64']).columns.tolist()
 categorical_features = X.select_dtypes(include=['object', 'category']).columns.tolist()
 
 # Preprocessing
+numeric_transformer = Pipeline(steps=[
+    ('imputer', SimpleImputer(strategy='median')),
+    ('scaler', StandardScaler())
+])
+
+categorical_transformer = Pipeline(steps=[
+    ('imputer', SimpleImputer(strategy='constant', fill_value='missing')),
+    ('onehot', OneHotEncoder(drop='first', sparse_output=False, handle_unknown='ignore'))
+])
+
 preprocessor = ColumnTransformer(
     transformers=[
-        ('num', StandardScaler(), numeric_features),
-        ('cat', OneHotEncoder(drop='first', sparse_output=False), categorical_features)
-    ],
-    remainder='passthrough'  # This will include any columns not explicitly mentioned
-)
+        ('num', numeric_transformer, numeric_features),
+        ('cat', categorical_transformer, categorical_features)
+    ])
 
 # Create a pipeline
 model = Pipeline([
@@ -91,7 +96,10 @@ if st.button('Predict House Price'):
         # Ensure input_df has all necessary columns
         for col in X.columns:
             if col not in input_df.columns:
-                input_df[col] = np.nan  # or some default value
+                if col in numeric_features:
+                    input_df[col] = 0  # or some appropriate default numeric value
+                else:
+                    input_df[col] = 'missing'  # or some appropriate default category
 
         # Reorder columns to match X
         input_df = input_df.reindex(columns=X.columns)
