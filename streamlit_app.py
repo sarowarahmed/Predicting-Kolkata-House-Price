@@ -59,8 +59,6 @@ with st.expander('Input Features'):
 # Split the data
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Method 1: Using scikit-learn
-
 # Preprocessing
 preprocessor = ColumnTransformer(
     transformers=[
@@ -88,3 +86,5 @@ if st.button('Predict House Price'):
     # Display Predicted Housing Price
     st.subheader('Predicted House Price')
     st.success(f'The predicted price for the house is ₹{prediction[0]:,.2f}')
+
+    
