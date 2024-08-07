@@ -43,7 +43,7 @@ with st.sidebar:
   Crime_Rate_in_Area = st.slider('Crime Rate in Area', 0,10)
   Air_Quality_Index = st.slider('AQI', 50,300,150)
   Ownership_Type = st.selectbox('Ownership Type', ('Freehold', 'Leasehold'))
-  Flood_Zone = st.selectbox('Flood Zone', ('Zone A', 'Zone B','Zone C','Zone D')
+  Flood_Zone = st.selectbox('Flood Zone', ('Zone A', 'Zone B','Zone C','Zone D'))
 
   #create DataFrame for Input Feature
   data = {'Location':Location,
