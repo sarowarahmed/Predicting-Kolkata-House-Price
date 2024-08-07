@@ -40,42 +40,10 @@ with st.sidebar:
           'Square_Footage': Square_Footage,
           'Furnishing_Status': Furnishing_Status}
   input_df = pd.DataFrame(data, index=[0])
-  input_concatenate = pd.concat([input_df, X], axix=0)
+  input_concatenate = pd.concat([input_df, X], axis=0)
 
 with st.expander('Input Features'):
   st.write('**Input Housing Data**')
   input_df
   st.write('**Combined Housing Data**')
   input_concatenate
-
-# Split the data
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-# Method 1: Using scikit-learn
-
-# Preprocessing
-preprocessor = ColumnTransformer(
-    transformers=[
-        ('num', StandardScaler(), ['Number_of_Bedrooms', 'Age_of_Property', 'Square_Footage', 'Crime_Rate_in_Area', 'Air_Quality_Index']),
-        ('cat', OneHotEncoder(drop='first', sparse=False), ['Location', 'Property_Type', 'Furnishing_Status', 'Ownership_Type', 'Flood_Zone'])
-    ])
-
-# Create a pipeline
-model = Pipeline([
-    ('preprocessor', preprocessor),
-    ('regressor', LinearRegression())
-])
-
-# Fit the model
-model.fit(X_train, y_train)
-
-# Make predictions
-y_pred = model.predict(X_test)
-
-# Evaluate the model
-mse = mean_squared_error(y_test, y_pred)
-r2 = r2_score(y_test, y_pred)
-
-print("Method 1 Results:")
-print("Mean squared error: ", mse)
-print("R-squared score: ", r2)
