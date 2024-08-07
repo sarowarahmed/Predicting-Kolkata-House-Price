@@ -82,12 +82,12 @@ model = Pipeline([
 ])
 
 # Fit the model
-model.fit(X_train, y_train)
+model.fit(X, y)
 
 # Make predictions
 if st.button('Predict House Price'):
     # Preprocess the input
-    input_processed = preprocessor.transform(input_df)
+    input_processed = model.named_steps['preprocessor'].transform(input_df)
     
     # Make prediction
     prediction = model.predict(input_processed)
