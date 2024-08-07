@@ -38,16 +38,24 @@ with st.sidebar:
   Property_Type = st.selectbox('Property Type', ('Apartment', 'Villa', 'Independent House'))
   Number_of_Bedrooms = st.slider('BHK', 1,4)
   Age_of_Property = st.slider('Property Age(Y)', 0,75,38)
-  Square_Footage = st.number_input('Insert Sq.ft',500,5000,2250)
   Furnishing_Status = st.selectbox('Furnishing Status', ('Furnished', 'Semi-furnished', 'Unfurnished'))
+  Square_Footage = st.number_input('Insert Sq.ft',500,5000,2250)
+  Crime_Rate_in_Area = st.slider('Crime Rate in Area', 0,10)
+  Air_Quality_Index = st.slider('AQI', 50,300,150)
+  Ownership_Type = st.selectbox('Ownership Type', ('Freehold', 'Leasehold'))
+  Flood_Zone = st.selectbox('Flood Zone', ('Zone A', 'Zone B','Zone C','Zone D')
 
   #create DataFrame for Input Feature
   data = {'Location':Location,
           'Property_Type': Property_Type,
           'Number_of_Bedrooms': Number_of_Bedrooms,
           'Age_of_Property': Age_of_Property,
+          'Furnishing_Status': Furnishing_Status,
           'Square_Footage': Square_Footage,
-          'Furnishing_Status': Furnishing_Status}
+          'Crime_Rate_in_Area': Crime_Rate_in_Area,
+          'Air_Quality_Index': Air_Quality_Index,
+          'Ownership_Type': Ownership_Type,
+          'Flood_Zone': Flood_Zone}
   input_df = pd.DataFrame(data, index=[0])
   input_concatenate = pd.concat([input_df, X], axis=0)
 
@@ -60,29 +68,11 @@ with st.expander('Input Features'):
 # Split the data
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Print column names for debugging
-st.write("Columns in X:", X.columns.tolist())
-st.write("Columns in input_df:", input_df.columns.tolist())
-
-# Identify numeric and categorical columns
-numeric_features = X.select_dtypes(include=['int64', 'float64']).columns.tolist()
-categorical_features = X.select_dtypes(include=['object', 'category']).columns.tolist()
-
 # Preprocessing
-numeric_transformer = Pipeline(steps=[
-    ('imputer', SimpleImputer(strategy='median')),
-    ('scaler', StandardScaler())
-])
-
-categorical_transformer = Pipeline(steps=[
-    ('imputer', SimpleImputer(strategy='constant', fill_value='missing')),
-    ('onehot', OneHotEncoder(drop='first', sparse_output=False, handle_unknown='ignore'))
-])
-
 preprocessor = ColumnTransformer(
     transformers=[
-        ('num', numeric_transformer, numeric_features),
-        ('cat', categorical_transformer, categorical_features)
+        ('num', StandardScaler(), ['Number_of_Bedrooms', 'Age_of_Property', 'Square_Footage', 'Crime_Rate_in_Area', 'Air_Quality_Index']),
+        ('cat', OneHotEncoder(drop='first', sparse=False), ['Location', 'Property_Type', 'Furnishing_Status', 'Ownership_Type', 'Flood_Zone'])
     ])
 
 # Create a pipeline
@@ -92,44 +82,16 @@ model = Pipeline([
 ])
 
 # Fit the model
-model.fit(X, y)
+model.fit(X_train, y_train)
 
 # Make predictions
 if st.button('Predict House Price'):
-    try:
-        # Ensure input_df has all necessary columns
-        for col in X.columns:
-            if col not in input_df.columns:
-                if col in numeric_features:
-                    input_df[col] = 0  # or some appropriate default numeric value
-                else:
-                    input_df[col] = 'missing'  # or some appropriate default category
-
-        # Reorder columns to match X
-        input_df = input_df.reindex(columns=X.columns)
-
-        # Preprocess the input
-        input_processed = model.named_steps['preprocessor'].transform(input_df)
-        
-        # Make prediction
-        prediction = model.predict(input_processed)
-        
-        # Display Predicted Housing Price
-        st.subheader('Predicted House Price')
-        st.success(f'The predicted price for the house is ₹{prediction[0]:,.2f}')
-
-        # Optional: Display model performance metrics
-        y_pred = model.predict(X)
-        mse = mean_squared_error(y, y_pred)
-        r2 = r2_score(y, y_pred)
-        
-        st.write('Model Performance:')
-        st.write(f'Mean Squared Error: {mse:,.2f}')
-        st.write(f'R-squared Score: {r2:.4f}')
-
-    except Exception as e:
-        st.error(f"An error occurred: {str(e)}")
-        st.write("Input DataFrame:")
-        st.write(input_df)
-        st.write("Model Columns:")
-        st.write(X.columns.tolist())
+    # Preprocess the input
+    input_processed = preprocessor.transform(input_df)
+    
+    # Make prediction
+    prediction = model.predict(input_processed)
+    
+    # Display Predicted Housing Price
+    st.subheader('Predicted House Price')
+    st.success(f'The predicted price for the house is ₹{prediction[0]:,.2f}')
