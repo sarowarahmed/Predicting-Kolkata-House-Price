@@ -86,22 +86,3 @@ if st.button('Predict House Price'):
     # Display Predicted Housing Price
     st.subheader('Predicted House Price')
     st.success(f'The predicted price for the house is ₹{prediction[0]:,.2f}')
-
-    # Optional: Display model performance metrics
-    y_pred = model.predict(X)
-    mse = mean_squared_error(y, y_pred)
-    r2 = r2_score(y, y_pred)
-    
-    st.write('Model Performance:')
-    st.write(f'Mean Squared Error: {mse:,.2f}')
-    st.write(f'R-squared Score: {r2:.4f}')
-
-# Optional: Add a plot to visualize the prediction
-if st.checkbox('Show Price Distribution'):
-    fig, ax = plt.subplots()
-    ax.hist(y, bins=30, edgecolor='black')
-    ax.axvline(prediction[0], color='red', linestyle='dashed', linewidth=2)
-    ax.set_xlabel('Price (₹)')
-    ax.set_ylabel('Frequency')
-    ax.set_title('House Price Distribution')
-    st.pyplot(fig)
