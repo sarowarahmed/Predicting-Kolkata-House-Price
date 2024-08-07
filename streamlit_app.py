@@ -92,3 +92,21 @@ if st.button('Predict House Price'):
         # Display Predicted Housing Price
         st.subheader('Predicted House Price')
         st.success(f'The predicted price for the house is ₹{prediction[0]:,.2f}')
+        # Optional: Display model performance metrics
+        y_pred = model.predict(X_test)
+        mse = mean_squared_error(y_test, y_pred)
+        r2 = r2_score(y_test, y_pred)
+        
+        st.write('Model Performance:')
+        st.write(f'Mean Squared Error: {mse:,.2f}')
+        st.write(f'R-squared Score: {r2:.4f}')
+
+    except Exception as e:
+        st.error(f"An error occurred: {str(e)}")
+        st.write("Input DataFrame:")
+        st.write(input_df)
+        st.write("Model Columns:")
+        st.write(X.columns.tolist())
+        st.write("Number of features in X:", len(X.columns))
+        st.write("Number of features in input_df:", len(input_df.columns))
+      
