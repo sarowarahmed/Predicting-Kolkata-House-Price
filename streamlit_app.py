@@ -28,3 +28,17 @@ with st.sidebar:
   Location = st.selectbox('Location', ('Salt Lake', 'New Town', 'Ballygunge', 'Alipore', 'Howrah', 'Madhyamgram'))
   Property_Type = st.selectbox('Property Type', ('Apartment', 'Villa', 'Independent House'))
   Number_of_Bedrooms = st.slider('BHK', 1,4)
+  Age_of_Property = st.slider('Property Age(Y)', 0,75,38)
+  Square_Footage = st.slider('Square Footage(sq.ft)', 500,5000,2750)
+  Furnishing_Status = st.selectbox('Furnishing Status', ('Furnished', 'Semi-furnished', 'Unfurnished'))
+
+  #create DataFrame for Input Feature
+  data = {'Location':Location,
+          'Property_Type': Property_Type,
+          'Number_of_Bedrooms': Number_of_Bedrooms,
+          'Age_of_Property': Age_of_Property,
+          'Square_Footage': Square_Footage,
+          'Furnishing_Status': Furnishing_Status}
+  input_df = pd.DataFrame(data, index[0])
+
+input_df
