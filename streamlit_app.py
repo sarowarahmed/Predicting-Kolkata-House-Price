@@ -63,7 +63,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 preprocessor = ColumnTransformer(
     transformers=[
         ('num', StandardScaler(), ['Number_of_Bedrooms', 'Age_of_Property', 'Square_Footage', 'Crime_Rate_in_Area', 'Air_Quality_Index']),
-        ('cat', OneHotEncoder(drop='first', sparse=False), ['Location', 'Property_Type', 'Furnishing_Status', 'Ownership_Type', 'Flood_Zone'])
+        ('cat', OneHotEncoder(drop='first', sparse_output=False), ['Location', 'Property_Type', 'Furnishing_Status', 'Ownership_Type', 'Flood_Zone'])
     ])
 
 # Create a pipeline
@@ -73,12 +73,12 @@ model = Pipeline([
 ])
 
 # Fit the model
-model.fit(X_train, y_train)
+model.fit(X, y)  # Using all data for simplicity, consider using train_test_split in practice
 
 # Make predictions
 if st.button('Predict House Price'):
     # Preprocess the input
-    input_processed = preprocessor.transform(input_df)
+    input_processed = model.named_steps['preprocessor'].transform(input_df)
     
     # Make prediction
     prediction = model.predict(input_processed)
@@ -87,4 +87,21 @@ if st.button('Predict House Price'):
     st.subheader('Predicted House Price')
     st.success(f'The predicted price for the house is ₹{prediction[0]:,.2f}')
 
+    # Optional: Display model performance metrics
+    y_pred = model.predict(X)
+    mse = mean_squared_error(y, y_pred)
+    r2 = r2_score(y, y_pred)
     
+    st.write('Model Performance:')
+    st.write(f'Mean Squared Error: {mse:,.2f}')
+    st.write(f'R-squared Score: {r2:.4f}')
+
+# Optional: Add a plot to visualize the prediction
+if st.checkbox('Show Price Distribution'):
+    fig, ax = plt.subplots()
+    ax.hist(y, bins=30, edgecolor='black')
+    ax.axvline(prediction[0], color='red', linestyle='dashed', linewidth=2)
+    ax.set_xlabel('Price (₹)')
+    ax.set_ylabel('Frequency')
+    ax.set_title('House Price Distribution')
+    st.pyplot(fig)
