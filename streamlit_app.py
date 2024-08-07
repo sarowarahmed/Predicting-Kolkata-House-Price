@@ -39,6 +39,6 @@ with st.sidebar:
           'Age_of_Property': Age_of_Property,
           'Square_Footage': Square_Footage,
           'Furnishing_Status': Furnishing_Status}
-  input_df = pd.DataFrame(data, index[0])
+  input_df = pd.DataFrame(data)
 
 input_df
