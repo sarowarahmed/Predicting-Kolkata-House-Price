@@ -85,12 +85,10 @@ model = Pipeline([
 model.fit(X_train, y_train)
 
 if st.button('Predict House Price'):
-    # Preprocess the input
-    input_processed = model.named_steps['preprocessor'].transform(input_df)
-    
-    # Make prediction
-    prediction = model.predict(input_processed)
-    
-    # Display Predicted Housing Price
-    st.subheader('Predicted House Price')
-    st.success(f'The predicted price for the house is ₹{prediction[0]:,.2f}')
+    try:
+        # Make prediction directly using the pipeline
+        prediction = model.predict(input_df)
+        
+        # Display Predicted Housing Price
+        st.subheader('Predicted House Price')
+        st.success(f'The predicted price for the house is ₹{prediction[0]:,.2f}')
